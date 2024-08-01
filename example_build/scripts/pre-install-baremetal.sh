@@ -35,8 +35,7 @@ apt-get -y install --no-install-recommends --download-only linux-headers-amd64 z
 apt-get -y dist-upgrade
 
 # Download GRUB for legagy and UEFI servers, both can't be installed simultaneously.
-apt-get -y install --no-install-recommends --download-only grub-efi-amd64
-apt-get -y install --no-install-recommends --download-only grub-pc
+apt-get -y install --no-install-recommends grub-pc
 # Make sure grub-efi-amd64 won't change the boot order.
 echo "grub-efi-amd64 grub2/update_nvram boolean false" | debconf-set-selections
 

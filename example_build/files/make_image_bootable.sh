@@ -34,7 +34,7 @@ fi
 
 # Install ZFS packages if required
 if lsblk -lno FSTYPE | grep -qxiF zfs_member; then
-    apt-get -y install --no-install-recommends linux-headers-amd64 zfs-dkms zfs-initramfs zfs-zed
+    apt-get -y install --no-install-recommends  --no-download --ignore-missing linux-headers-amd64 zfs-dkms zfs-initramfs zfs-zed
     # Make sure zpools are imported at boot, this is not required when / is ZFS because the initramfs
     # imports the pool. However, it is necessary if e.g. /home is ZFS and / is ext4.
     systemctl enable zfs-import-scan.service
@@ -42,7 +42,7 @@ fi
 
 if [ -d /sys/firmware/efi ]; then
     echo "INFO - GRUB will be configured for UEFI boot"
-    apt-get -y install --no-install-recommends grub-efi-amd64
+    apt-get -y install --no-install-recommends  --no-download --ignore-missing grub-efi-amd64
     # grub-efi-amd64's postinst script does not install GRUB to the EFI partition,
     # it only updates it:
     # https://salsa.debian.org/grub-team/grub/-/commit/74eb20a6d7a3
@@ -50,7 +50,6 @@ if [ -d /sys/firmware/efi ]; then
     # This means we need to install GRUB manually (and we do that after installing grub-efi-amd64
     # to prevent it from calling grub-install a second time).
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --no-nvram
-    apt-get -y purge grub-pc-bin
 else
     echo "INFO - GRUB will be configured for legacy boot"
     realBootDevicesById=()
@@ -73,8 +72,7 @@ else
     done
     # shellcheck disable=SC2001
     echo "grub-pc grub-pc/install_devices multiselect $(sed 's/ /, /g' <<<"${realBootDevicesById[@]}")" | debconf-set-selections
-    apt-get -y install --no-install-recommends grub-pc
-    apt-get -y purge grub-efi-amd64-bin
+    dpkg-reconfigure grub-pc
 fi
 apt-get -y autoremove
 apt-get -y clean
